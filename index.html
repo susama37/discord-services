@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA — Discord Services</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080d;
+  --bg2:#0d0f17;
+  --card:#11131d;
+  --card2:#151824;
+  --border:#252938;
+  --text:#f5f7ff;
+  --muted:#9298aa;
+  --accent:#7c5cff;
+  --accent2:#5c8cff;
+  --green:#4ade80;
+  --red:#ff5c6c;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+  line-height:1.5;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+.nav{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(7,8,13,.88);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:1200px;
+  margin:auto;
+  height:70px;
+  padding:0 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:800;
+  font-size:20px;
+}
+.brand img{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  object-fit:cover;
+  background:#191c28;
+}
+.nav-links{
+  display:flex;
+  gap:25px;
+  color:var(--muted);
+  font-size:14px;
+}
+.nav-links a:hover{color:white}
+.nav-actions{display:flex;gap:9px}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:11px 17px;
+  color:white;
+  background:var(--accent);
+  font-weight:700;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn.secondary{
+  background:#171a25;
+  border:1px solid var(--border);
+}
+.btn.green{background:#198754}
+.btn.red{background:#b92e3d}
+
+.hero{
+  min-height:680px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:90px 20px;
+  background:
+    radial-gradient(circle at 50% 25%,rgba(124,92,255,.22),transparent 35%),
+    var(--bg);
+}
+.hero-inner{max-width:850px}
+.badge{
+  display:inline-block;
+  padding:7px 12px;
+  border:1px solid #34384c;
+  border-radius:999px;
+  background:#11131d;
+  color:#bfc4d5;
+  font-size:13px;
+  margin-bottom:20px;
+}
+.hero h1{
+  font-size:clamp(45px,8vw,85px);
+  line-height:1;
+  letter-spacing:-4px;
+}
+.hero h1 span{
+  background:linear-gradient(90deg,#fff,#9279ff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.hero p{
+  color:var(--muted);
+  max-width:650px;
+  margin:25px auto;
+  font-size:18px;
+}
+.hero-buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+
+.section{
+  max-width:1200px;
+  margin:auto;
+  padding:85px 22px;
+}
+.section-head{
+  margin-bottom:35px;
+}
+.section-head h2{
+  font-size:34px;
+  margin-bottom:8px;
+}
+.section-head p{color:var(--muted)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:25px;
+}
+.card h3{margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+
+.icon{
+  width:45px;
+  height:45px;
+  border-radius:12px;
+  background:#1b1830;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:18px;
+  font-size:20px;
+}
+
+.packages{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.package{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:25px;
+}
+.package.featured{
+  border-color:#6952dc;
+  box-shadow:0 0 40px rgba(124,92,255,.12);
+}
+.package-title{font-size:14px;color:#b6b9c8}
+.price{
+  font-size:36px;
+  font-weight:900;
+  margin:10px 0 20px;
+}
+.package ul{
+  list-style:none;
+  display:grid;
+  gap:11px;
+  margin-bottom:22px;
+}
+.package li{
+  color:#c9ccda;
+  font-size:14px;
+}
+.package li::before{
+  content:"✓";
+  color:var(--green);
+  margin-right:8px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+.stat{
+  text-align:center;
+  padding:25px;
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:15px;
+}
+.stat strong{
+  display:block;
+  font-size:30px;
+}
+.stat span{color:var(--muted);font-size:13px}
+
+.work-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.work{
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:15px;
+  background:var(--card);
+}
+.work img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  display:block;
+}
+.work-info{padding:17px}
+.work-info p{color:var(--muted);font-size:13px}
+
+.vouches{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.vouch{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:22px;
+}
+.vouch-top{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:15px;
+}
+.vouch-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#222532;
+}
+.vouch small{color:var(--muted)}
+.stars{color:#ffd34d}
+.vouch p{color:#c6cad7;font-size:14px}
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+.step{
+  padding:22px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:15px;
+}
+.step-number{
+  color:#917cff;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.faq{
+  display:grid;
+  gap:10px;
+}
+details{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--muted);margin-top:12px}
+
+.cta{
+  text-align:center;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:60px 20px;
+  background:
+    radial-gradient(circle at center,rgba(124,92,255,.14),transparent 60%),
+    var(--card);
+}
+.cta p{color:var(--muted);margin:12px auto 22px}
+
+footer{
+  border-top:1px solid var(--border);
+  color:var(--muted);
+  text-align:center;
+  padding:30px;
+  font-size:13px;
+}
+
+/* MODALS */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:500;
+  padding:20px;
+}
+.modal.active{display:flex}
+.modal-box{
+  width:100%;
+  max-width:550px;
+  max-height:90vh;
+  overflow:auto;
+  background:#0e1018;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:25px;
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+.close{
+  background:none;
+  color:#aaa;
+  border:0;
+  font-size:25px;
+}
+.form-group{margin-bottom:15px}
+label{
+  display:block;
+  font-size:13px;
+  color:#b7bbca;
+  margin-bottom:6px;
+}
+input,textarea,select{
+  width:100%;
+  background:#171a24;
+  border:1px solid #292d3d;
+  color:white;
+  border-radius:10px;
+  padding:12px;
+  outline:none;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:#6d58d9;
+}
+textarea{min-height:110px;resize:vertical}
+
+.notice{
+  padding:12px;
+  background:#171a24;
+  border:1px solid var(--border);
+  color:var(--muted);
+  border-radius:10px;
+  margin-bottom:15px;
+  font-size:13px;
+}
+.error{
+  color:#ff7884;
+  font-size:13px;
+  margin-top:10px;
+}
+.success{
+  color:#69df91;
+  font-size:13px;
+  margin-top:10px;
+}
+
+/* DASHBOARD */
+.dashboard{
+  display:none;
+  min-height:100vh;
+  background:#080910;
+}
+.dashboard.active{display:block}
+.dash-nav{
+  height:65px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 22px;
+}
+.dash-content{
+  max-width:1250px;
+  margin:auto;
+  padding:30px 22px;
+}
+.user-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.user-box img{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin-bottom:25px;
+}
+.tab{
+  white-space:nowrap;
+  padding:10px 15px;
+  background:#131621;
+  border:1px solid var(--border);
+  color:#aaa;
+  border-radius:9px;
+  cursor:pointer;
+}
+.tab.active{
+  background:#241d49;
+  color:white;
+  border-color:#5846a7;
+}
+.panel{display:none}
+.panel.active{display:block}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:13px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+th,td{
+  padding:14px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:13px;
+}
+th{color:#aaa;background:#11131b}
+td{color:#d4d6df}
+.status{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:11px;
+  background:#242735;
+}
+.status.pending{color:#ffd15c}
+.status.approved{color:#69df91}
+.status.rejected{color:#ff727d}
+
+.admin-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+.preview-pfp{
+  width:80px;
+  height:80px;
+  border-radius:20px;
+  object-fit:cover;
+  display:block;
+  margin-bottom:12px;
+}
+
+.hidden{display:none!important}
+
+@media(max-width:800px){
+  .nav-links{display:none}
+  .grid,.packages,.work-grid,.vouches{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .admin-grid{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+  .hero h1{letter-spacing:-2px}
+  .stats,.steps{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<!-- PUBLIC WEBSITE -->
+<div id="publicSite">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="brand">
+      <img id="navPfp" src="">
+      <span id="navBrand">NOVA</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#packages">Packages</a>
+      <a href="#work">Our Work</a>
+      <a href="#vouches">Vouches</a>
+      <a href="#faq">FAQ</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" onclick="openAdminLogin()">Admin</button>
+      <button class="btn" onclick="customerLogin()">Order</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">DISCORD SERVER SERVICES</div>
+    <h1>We build Discords that <span>stand out.</span></h1>
+    <p>
+      Professional Discord server setup, redesign, automation,
+      systems and custom solutions built around your community.
+    </p>
+
+    <div class="hero-buttons">
+      <button class="btn" onclick="customerLogin()">Start Your Order</button>
+      <a class="btn secondary" href="#work">View Our Work</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="section-head">
+    <h2>What We Do</h2>
+    <p>Everything needed to turn a basic Discord server into a professional community.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="icon">🏗️</div>
+      <h3>Server Setup</h3>
+      <p>Complete channel, category, role and permission structures.</p>
+    </div>
+
+    <div class="card">
+      <div class="icon">🎨</div>
+      <h3>Server Design</h3>
+      <p>Clean layouts, professional formatting and custom server branding.</p>
+    </div>
+
+    <div class="card">
+      <div class="icon">🤖</div>
+      <h3>Bots & Systems</h3>
+      <p>Tickets, moderation, applications, automation and useful bot systems.</p>
+    </div>
+
+    <div class="card">
+      <div class="icon">👮</div>
+      <h3>Staff Structure</h3>
+      <p>Organized staff hierarchy, permissions and management systems.</p>
+    </div>
+
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>Custom Systems</h3>
+      <p>Custom embeds, webhooks and special systems designed for your server.</p>
+    </div>
+
+    <div class="card">
+      <div class="icon">🔄</div>
+      <h3>Full Reworks</h3>
+      <p>Transform an old or inactive server into a completely redesigned community.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="packages">
+  <div class="section-head">
+    <h2>Packages</h2>
+    <p>Pricing is based on Blox Fruits Values. Exact fruits are negotiable.</p>
+  </div>
+
+  <div class="packages">
+
+    <div class="package">
+      <div class="package-title">🟢 BASIC</div>
+      <div class="price" id="basicPrice">10M</div>
+
+      <ul>
+        <li>Server Setup</li>
+        <li>Basic Design & Layout</li>
+        <li>Basic Bots & Systems</li>
+        <li>Basic Staff & Permissions</li>
+      </ul>
+
+      <button class="btn" onclick="customerLogin()">Order Basic</button>
+    </div>
+
+    <div class="package featured">
+      <div class="package-title">🔵 ADVANCED</div>
+      <div class="price" id="advancedPrice">25M</div>
+
+      <ul>
+        <li>Everything in Basic</li>
+        <li>Advanced Design & Layout</li>
+        <li>Advanced Bots & Systems</li>
+        <li>Advanced Staff Structure</li>
+        <li>Tickets & Applications</li>
+        <li>Full Server Rework</li>
+      </ul>
+
+      <button class="btn" onclick="customerLogin()">Order Advanced</button>
+    </div>
+
+    <div class="package">
+      <div class="package-title">👑 FULL</div>
+      <div class="price" id="fullPrice">50M+</div>
+
+      <ul>
+        <li>Everything in Advanced</li>
+        <li>Fully Custom Structure</li>
+        <li>Advanced Automation</li>
+        <li>Custom Systems</li>
+        <li>Custom Webhooks & Embeds</li>
+        <li>Advanced Staff Architecture</li>
+        <li>Priority Service</li>
+      </ul>
+
+      <button class="btn" onclick="customerLogin()">Order Full</button>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="stats">
+    <div class="stat"><strong id="statProjects">0</strong><span>Projects</span></div>
+    <div class="stat"><strong id="statClients">0</strong><span>Clients</span></div>
+    <div class="stat"><strong id="statSystems">0</strong><span>Systems</span></div>
+    <div class="stat"><strong id="statRating">0★</strong><span>Rating</span></div>
+  </div>
+</section>
+
+<section class="section" id="work">
+  <div class="section-head">
+    <h2>Our Work</h2>
+    <p>Some of the servers and systems we've worked on.</p>
+  </div>
+
+  <div class="work-grid" id="workGrid">
+    <div class="card"><p>No projects added yet.</p></div>
+  </div>
+</section>
+
+<section class="section" id="vouches">
+  <div class="section-head">
+    <h2>Client Vouches</h2>
+    <p>Feedback from customers.</p>
+  </div>
+
+  <div class="vouches" id="vouchesGrid">
+    <div class="card"><p>No vouches yet.</p></div>
+  </div>
+
+  <br>
+  <button class="btn secondary" onclick="customerLogin()">Leave a Vouch</button>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>How It Works</h2>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">01</div>
+      <h3>Login</h3>
+      <p>Login using your Discord account.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-number">02</div>
+      <h3>Choose</h3>
+      <p>Select the package that fits your project.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-number">03</div>
+      <h3>Describe</h3>
+      <p>Tell us exactly what you want built.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-number">04</div>
+      <h3>Build</h3>
+      <p>We complete the work and deliver your server.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="section-head">
+    <h2>FAQ</h2>
+  </div>
+
+  <div class="faq">
+    <details>
+      <summary>What do you accept as payment?</summary>
+      <p>Payment is based on Blox Fruits Values. Exact fruits can be discussed before the order.</p>
+    </details>
+
+    <details>
+      <summary>Can I request custom work?</summary>
+      <p>Yes. Custom requirements can be included in the order request.</p>
+    </details>
+
+    <details>
+      <summary>Can I submit feedback?</summary>
+      <p>Yes. Login with Discord and submit your feedback from the customer dashboard.</p>
+    </details>
+
+    <details>
+      <summary>How do I contact you?</summary>
+      <p>Use the Discord button below after the order is created.</p>
+    </details>
+  </div>
+</section>
+
+<section class="section">
+  <div class="cta">
+    <h2>Ready to build your server?</h2>
+    <p>Login with Discord and send us your requirements.</p>
+    <button class="btn" onclick="customerLogin()">Start Your Order</button>
+  </div>
+</section>
+
+<footer>
+  <span id="footerBrand">NOVA</span> • Discord Services
+</footer>
+
+</div>
+
+
+<!-- CUSTOMER DASHBOARD -->
+<div id="customerDashboard" class="dashboard">
+
+  <div class="dash-nav">
+    <div class="brand">
+      <img id="customerAvatar" src="">
+      <span>Customer Dashboard</span>
+    </div>
+
+    <div class="user-box">
+      <span id="customerName"></span>
+      <button class="btn secondary" onclick="customerLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <div class="tabs">
+      <button class="tab active" onclick="customerTab('newOrder',this)">New Order</button>
+      <button class="tab" onclick="customerTab('myOrders',this)">My Orders</button>
+      <button class="tab" onclick="customerTab('vouch',this)">Leave Vouch</button>
+    </div>
+
+    <div id="newOrder" class="panel active">
+      <div class="card">
+        <h2>Place an Order</h2>
+        <br>
+
+        <div class="form-group">
+          <label>Package</label>
+          <select id="orderPackage">
+            <option value="BASIC">🟢 BASIC — 10M</option>
+            <option value="ADVANCED">🔵 ADVANCED — 25M</option>
+            <option value="FULL">👑 FULL — 50M+</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Your Requirements</label>
+          <textarea id="orderRequirements"
+            placeholder="Tell us what you want done..."></textarea>
+        </div>
+
+        <button class="btn" onclick="submitOrder()">Submit Order</button>
+        <div id="orderMessage"></div>
+      </div>
+    </div>
+
+    <div id="myOrders" class="panel">
+      <div class="card">
+        <h2>My Orders</h2>
+        <br>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Requirements</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="customerOrders"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="vouch" class="panel">
+      <div class="card">
+        <h2>Leave a Vouch</h2>
+        <br>
+
+        <div class="notice">
+          Your vouch will be reviewed by an admin before appearing publicly.
+        </div>
+
+        <div class="form-group">
+          <label>Rating</label>
+          <select id="vouchRating">
+            <option value="5">★★★★★ — 5</option>
+            <option value="4">★★★★☆ — 4</option>
+            <option value="3">★★★☆☆ — 3</option>
+            <option value="2">★★☆☆☆ — 2</option>
+            <option value="1">★☆☆☆☆ — 1</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Feedback</label>
+          <textarea id="vouchText"
+            placeholder="Tell us about your experience..."></textarea>
+        </div>
+
+        <button class="btn" onclick="submitVouch()">Submit Vouch</button>
+        <div id="vouchMessage"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ADMIN LOGIN -->
+<div class="modal" id="adminLoginModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Admin Login</h2>
+      <button class="close" onclick="closeModal('adminLoginModal')">×</button>
+    </div>
+
+    <div class="notice">
+      This login is separate from customer Discord login.
+    </div>
+
+    <div class="form-group">
+      <label>Admin Email</label>
+      <input id="adminEmail" type="email" placeholder="admin@email.com">
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input id="adminPassword" type="password">
+    </div>
+
+    <button class="btn" onclick="adminLogin()">Login</button>
+    <div id="adminLoginMessage"></div>
+  </div>
+</div>
+
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminDashboard" class="dashboard">
+
+  <div class="dash-nav">
+    <div class="brand">
+      <img id="adminPfpTop" src="">
+      <span>Admin Dashboard</span>
+    </div>
+
+    <button class="btn secondary" onclick="adminLogout()">Logout</button>
+  </div>
+
+  <div class="dash-content">
+
+    <div class="tabs">
+      <button class="tab active" onclick="adminTab('adminOverview',this)">Orders</button>
+      <button class="tab" onclick="adminTab('adminSettings',this)">Website</button>
+      <button class="tab" onclick="adminTab('adminWork',this)">Our Work</button>
+      <button class="tab" onclick="adminTab('adminVouches',this)">Vouches</button>
+      <button class="tab" onclick="adminTab('adminSecurity',this)">Security</button>
+    </div>
+
+
+    <!-- ORDERS -->
+    <div id="adminOverview" class="panel active">
+      <div class="card">
+        <h2>Customer Orders</h2>
+        <br>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Package</th>
+                <th>Requirements</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrders"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- WEBSITE SETTINGS -->
+    <div id="adminSettings" class="panel">
+
+      <div class="admin-grid">
+
+        <div class="card">
+          <h2>Website Settings</h2>
+          <br>
+
+          <div class="form-group">
+            <label>Business Name</label>
+            <input id="settingBrand">
+          </div>
+
+          <div class="form-group">
+            <label>Discord Invite</label>
+            <input id="settingInvite" placeholder="https://discord.gg/...">
+          </div>
+
+          <button class="btn" onclick="saveSettings()">Save Settings</button>
+          <div id="settingsMessage"></div>
+        </div>
+
+
+        <div class="card">
+          <h2>Change PFP</h2>
+          <br>
+
+          <img id="settingsPfpPreview" class="preview-pfp" src="">
+
+          <input id="pfpFile" type="file" accept="image/*">
+          <br><br>
+
+          <button class="btn" onclick="uploadPfp()">Upload PFP</button>
+          <div id="pfpMessage"></div>
+        </div>
+
+
+        <div class="card">
+          <h2>Packages</h2>
+          <br>
+
+          <div class="form-group">
+            <label>Basic Price</label>
+            <input id="editBasic">
+          </div>
+
+          <div class="form-group">
+            <label>Advanced Price</label>
+            <input id="editAdvanced">
+          </div>
+
+          <div class="form-group">
+            <label>Full Price</label>
+            <input id="editFull">
+          </div>
+
+          <button class="btn" onclick="savePrices()">Save Prices</button>
+          <div id="pricesMessage"></div>
+        </div>
+
+
+        <div class="card">
+          <h2>Stats</h2>
+          <br>
+
+          <div class="form-group">
+            <label>Projects</label>
+            <input id="editProjects">
+          </div>
+
+          <div class="form-group">
+            <label>Clients</label>
+            <input id="editClients">
+          </div>
+
+          <div class="form-group">
+            <label>Systems</label>
+            <input id="editSystems">
+          </div>
+
+          <div class="form-group">
+            <label>Rating</label>
+            <input id="editRating" placeholder="5.0★">
+          </div>
+
+          <button class="btn" onclick="saveStats()">Save Stats</button>
+          <div id="statsMessage"></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- OUR WORK -->
+    <div id="adminWork" class="panel">
+
+      <div class="card">
+        <h2>Add Project</h2>
+        <br>
+
+        <div class="form-group">
+          <label>Project Name</label>
+          <input id="projectTitle">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <input id="projectDescription">
+        </div>
+
+        <div class="form-group">
+          <label>Image</label>
+          <input id="projectImage" type="file" accept="image/*">
+        </div>
+
+        <button class="btn" onclick="addProject()">Add Project</button>
+        <div id="projectMessage"></div>
+      </div>
+
+      <br>
+
+      <div class="work-grid" id="adminWorkGrid"></div>
+    </div>
+
+
+    <!-- VOUCHES -->
+    <div id="adminVouches" class="panel">
+
+      <div class="card">
+        <h2>Pending Vouches</h2>
+        <br>
+        <div id="pendingVouches"></div>
+      </div>
+
+      <br>
+
+      <div class="card">
+        <h2>Add Vouch Manually</h2>
+        <br>
+
+        <div class="form-group">
+          <label>Client Name</label>
+          <input id="manualVouchName">
+        </div>
+
+        <div class="form-group">
+          <label>Rating</label>
+          <select id="manualVouchRating">
+            <option value="5">5</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Feedback</label>
+          <textarea id="manualVouchText"></textarea>
+        </div>
+
+        <button class="btn" onclick="addManualVouch()">Add Vouch</button>
+        <div id="manualVouchMessage"></div>
+      </div>
+
+      <br>
+
+      <div class="card">
+        <h2>Approved Vouches</h2>
+        <br>
+        <div id="approvedVouchesAdmin"></div>
+      </div>
+
+    </div>
+
+
+    <!-- SECURITY -->
+    <div id="adminSecurity" class="panel">
+
+      <div class="card" style="max-width:500px">
+        <h2>Change Admin Password</h2>
+        <br>
+
+        <div class="notice">
+          This changes the password of the currently logged-in admin account.
+        </div>
+
+        <div class="form-group">
+          <label>New Password</label>
+          <input id="newAdminPassword" type="password">
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input id="confirmAdminPassword" type="password">
+        </div>
+
+        <button class="btn" onclick="changeAdminPassword()">Change Password</button>
+        <div id="passwordMessage"></div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+/* =========================================================
+   PUT YOUR SUPABASE DETAILS HERE
+   ========================================================= */
+
+const SUPABASE_URL = "https://prxdyxhxhtmewtfueqhf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_WHPFAw3jsGzRvme4d_2Mvw_DEm-kmTd";
+
+/* Change this only if your storage bucket has another name */
+const STORAGE_BUCKET = "site-assets";
+
+
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+let currentUser = null;
+let currentSettings = null;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+function closeModal(id){
+  $(id).classList.remove("active");
+}
+
+function openModal(id){
+  $(id).classList.add("active");
+}
+
+function escapeHTML(value){
+  if(value === null || value === undefined) return "";
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function formatDate(date){
+  return new Date(date).toLocaleDateString();
+}
+
+function getAvatar(user){
+  const m = user?.user_metadata || {};
+  return m.avatar_url ||
+         m.picture ||
+         "https://cdn.discordapp.com/embed/avatars/0.png";
+}
+
+function getName(user){
+  const m = user?.user_metadata || {};
+  return m.full_name ||
+         m.name ||
+         m.user_name ||
+         m.preferred_username ||
+         user?.email ||
+         "Discord User";
+}
+
+
+/* =========================================================
+   WEBSITE SETTINGS
+   ========================================================= */
+
+async function loadSettings(){
+
+  const {data,error} = await sb
+    .from("site_settings")
+    .select("*")
+    .eq("id",1)
+    .maybeSingle();
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  if(!data) return;
+
+  currentSettings = data;
+
+  $("navBrand").textContent = data.brand_name || "NOVA";
+  $("footerBrand").textContent = data.brand_name || "NOVA";
+
+  if(data.pfp_url){
+    $("navPfp").src = data.pfp_url;
+    $("settingsPfpPreview").src = data.pfp_url;
+    $("adminPfpTop").src = data.pfp_url;
+  }
+
+  $("basicPrice").textContent = data.basic_price || "10M";
+  $("advancedPrice").textContent = data.advanced_price || "25M";
+  $("fullPrice").textContent = data.full_price || "50M+";
+
+  $("statProjects").textContent = data.projects_stat || "0";
+  $("statClients").textContent = data.clients_stat || "0";
+  $("statSystems").textContent = data.systems_stat || "0";
+  $("statRating").textContent = data.rating_stat || "0★";
+}
+
+
+/* =========================================================
+   CUSTOMER DISCORD LOGIN
+   ========================================================= */
+
+async function customerLogin(){
+
+  const redirect =
+    window.location.origin +
+    window.location.pathname;
+
+  const {error} = await sb.auth.signInWithOAuth({
+    provider:"discord",
+    options:{
+      redirectTo:redirect
+    }
+  });
+
+  if(error){
+    alert(error.message);
+  }
+}
+
+
+/* =========================================================
+   CUSTOMER SESSION
+   ========================================================= */
+
+async function checkSession(){
+
+  const {data} = await sb.auth.getSession();
+
+  if(data.session){
+    currentUser = data.session.user;
+
+    const isAdmin = await checkIfAdmin(currentUser.id);
+
+    if(isAdmin){
+      return;
+    }
+
+    showCustomerDashboard();
+  }
+}
+
+async function checkIfAdmin(userId){
+
+  const {data,error} = await sb
+    .from("admins")
+    .select("user_id")
+    .eq("user_id",userId)
+    .maybeSingle();
+
+  if(error){
+    console.error(error);
+    return false;
+  }
+
+  return !!data;
+}
+
+
+function showCustomerDashboard(){
+
+  $("publicSite").style.display = "none";
+  $("customerDashboard").classList.add("active");
+  $("adminDashboard").classList.remove("active");
+
+  const avatar = getAvatar(currentUser);
+
+  $("customerAvatar").src = avatar;
+  $("customerName").textContent = getName(currentUser);
+
+  loadCustomerOrders();
+}
+
+
+async function customerLogout(){
+
+  await sb.auth.signOut();
+
+  currentUser = null;
+
+  $("customerDashboard").classList.remove("active");
+  $("publicSite").style.display = "block";
+}
+
+
+/* =========================================================
+   CUSTOMER TABS
+   ========================================================= */
+
+function customerTab(id,button){
+
+  document.querySelectorAll("#customerDashboard .panel")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.querySelectorAll("#customerDashboard .tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  $(id).classList.add("active");
+  button.classList.add("active");
+
+  if(id === "myOrders"){
+    loadCustomerOrders();
+  }
+}
+
+
+/* =========================================================
+   CUSTOMER ORDERS
+   ========================================================= */
+
+async function submitOrder(){
+
+  if(!currentUser){
+    return;
+  }
+
+  const packageName = $("orderPackage").value;
+  const requirements = $("orderRequirements").value.trim();
+
+  if(!requirements){
+    $("orderMessage").innerHTML =
+      '<div class="error">Please describe your requirements.</div>';
+    return;
+  }
+
+  const {error} = await sb
+    .from("orders")
+    .insert({
+      user_id:currentUser.id,
+      package_name:packageName,
+      requirements:requirements,
+      status:"Pending"
+    });
+
+  if(error){
+    $("orderMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("orderRequirements").value = "";
+
+  $("orderMessage").innerHTML =
+    '<div class="success">Order submitted successfully.</div>';
+
+  loadCustomerOrders();
+}
+
+
+async function loadCustomerOrders(){
+
+  if(!currentUser) return;
+
+  const {data,error} = await sb
+    .from("orders")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const tbody = $("customerOrders");
+
+  if(!data || !data.length){
+    tbody.innerHTML =
+      '<tr><td colspan="4">No orders yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(o=>`
+    <tr>
+      <td>${escapeHTML(o.package_name)}</td>
+      <td>${escapeHTML(o.requirements)}</td>
+      <td><span class="status ${o.status.toLowerCase()}">${escapeHTML(o.status)}</span></td>
+      <td>${formatDate(o.created_at)}</td>
+    </tr>
+  `).join("");
+}
+
+
+/* =========================================================
+   CUSTOMER VOUCH
+   ========================================================= */
+
+async function submitVouch(){
+
+  if(!currentUser) return;
+
+  const rating = Number($("vouchRating").value);
+  const text = $("vouchText").value.trim();
+
+  if(!text){
+    $("vouchMessage").innerHTML =
+      '<div class="error">Please write your feedback.</div>';
+    return;
+  }
+
+  const {error} = await sb
+    .from("vouches")
+    .insert({
+      user_id:currentUser.id,
+      client_name:getName(currentUser),
+      rating:rating,
+      text:text,
+      avatar_url:getAvatar(currentUser),
+      status:"Pending"
+    });
+
+  if(error){
+    $("vouchMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("vouchText").value = "";
+
+  $("vouchMessage").innerHTML =
+    '<div class="success">Vouch submitted for approval.</div>';
+}
+
+
+/* =========================================================
+   PUBLIC VOUCHES
+   ========================================================= */
+
+async function loadPublicVouches(){
+
+  const {data,error} = await sb
+    .from("vouches")
+    .select("*")
+    .eq("status","Approved")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const grid = $("vouchesGrid");
+
+  if(!data || !data.length){
+    grid.innerHTML =
+      '<div class="card"><p>No vouches yet.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(v=>`
+
+    <div class="vouch">
+
+      <div class="vouch-top">
+        <img class="vouch-avatar"
+             src="${escapeHTML(v.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png")}">
+
+        <div>
+          <strong>${escapeHTML(v.client_name)}</strong>
+          <br>
+          <small>${formatDate(v.created_at)}</small>
+        </div>
+      </div>
+
+      <div class="stars">
+        ${"★".repeat(Number(v.rating || 5))}
+        <span style="color:#555">
+          ${"★".repeat(5-Number(v.rating || 5))}
+        </span>
+      </div>
+
+      <br>
+
+      <p>${escapeHTML(v.text)}</p>
+
+    </div>
+
+  `).join("");
+}
+
+
+/* =========================================================
+   ADMIN LOGIN
+   ========================================================= */
+
+function openAdminLogin(){
+  openModal("adminLoginModal");
+}
+
+
+async function adminLogin(){
+
+  const email = $("adminEmail").value.trim();
+  const password = $("adminPassword").value;
+
+  if(!email || !password){
+    $("adminLoginMessage").innerHTML =
+      '<div class="error">Enter your email and password.</div>';
+    return;
+  }
+
+  const {data,error} = await sb.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    $("adminLoginMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  const allowed = await checkIfAdmin(data.user.id);
+
+  if(!allowed){
+
+    await sb.auth.signOut();
+
+    $("adminLoginMessage").innerHTML =
+      '<div class="error">This account is not an authorized admin.</div>';
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  closeModal("adminLoginModal");
+
+  showAdminDashboard();
+}
+
+
+function showAdminDashboard(){
+
+  $("publicSite").style.display = "none";
+  $("customerDashboard").classList.remove("active");
+  $("adminDashboard").classList.add("active");
+
+  loadAdminData();
+}
+
+
+async function adminLogout(){
+
+  await sb.auth.signOut();
+
+  currentUser = null;
+
+  $("adminDashboard").classList.remove("active");
+  $("publicSite").style.display = "block";
+}
+
+
+/* =========================================================
+   ADMIN TABS
+   ========================================================= */
+
+function adminTab(id,button){
+
+  document.querySelectorAll("#adminDashboard .panel")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.querySelectorAll("#adminDashboard .tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  $(id).classList.add("active");
+  button.classList.add("active");
+
+  if(id === "adminOverview") loadAdminOrders();
+  if(id === "adminWork") loadAdminWork();
+  if(id === "adminVouches") loadAdminVouches();
+}
+
+
+/* =========================================================
+   ADMIN DATA
+   ========================================================= */
+
+async function loadAdminData(){
+
+  await loadAdminSettings();
+  await loadAdminOrders();
+  await loadAdminWork();
+  await loadAdminVouches();
+}
+
+
+/* =========================================================
+   ADMIN SETTINGS
+   ========================================================= */
+
+async function loadAdminSettings(){
+
+  const {data,error} = await sb
+    .from("site_settings")
+    .select("*")
+    .eq("id",1)
+    .single();
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  currentSettings = data;
+
+  $("settingBrand").value = data.brand_name || "";
+  $("settingInvite").value = data.discord_invite || "";
+
+  $("editBasic").value = data.basic_price || "10M";
+  $("editAdvanced").value = data.advanced_price || "25M";
+  $("editFull").value = data.full_price || "50M+";
+
+  $("editProjects").value = data.projects_stat || "0";
+  $("editClients").value = data.clients_stat || "0";
+  $("editSystems").value = data.systems_stat || "0";
+  $("editRating").value = data.rating_stat || "0★";
+
+  if(data.pfp_url){
+    $("settingsPfpPreview").src = data.pfp_url;
+    $("adminPfpTop").src = data.pfp_url;
+  }
+}
+
+
+async function saveSettings(){
+
+  const {error} = await sb
+    .from("site_settings")
+    .update({
+      brand_name:$("settingBrand").value.trim(),
+      discord_invite:$("settingInvite").value.trim()
+    })
+    .eq("id",1);
+
+  if(error){
+    $("settingsMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("settingsMessage").innerHTML =
+    '<div class="success">Settings saved.</div>';
+
+  loadSettings();
+}
+
+
+async function savePrices(){
+
+  const {error} = await sb
+    .from("site_settings")
+    .update({
+      basic_price:$("editBasic").value.trim(),
+      advanced_price:$("editAdvanced").value.trim(),
+      full_price:$("editFull").value.trim()
+    })
+    .eq("id",1);
+
+  if(error){
+    $("pricesMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("pricesMessage").innerHTML =
+    '<div class="success">Prices updated.</div>';
+
+  loadSettings();
+}
+
+
+async function saveStats(){
+
+  const {error} = await sb
+    .from("site_settings")
+    .update({
+      projects_stat:$("editProjects").value.trim(),
+      clients_stat:$("editClients").value.trim(),
+      systems_stat:$("editSystems").value.trim(),
+      rating_stat:$("editRating").value.trim()
+    })
+    .eq("id",1);
+
+  if(error){
+    $("statsMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("statsMessage").innerHTML =
+    '<div class="success">Stats updated.</div>';
+
+  loadSettings();
+}
+
+
+/* =========================================================
+   ADMIN PFP
+   ========================================================= */
+
+async function uploadPfp(){
+
+  const file = $("pfpFile").files[0];
+
+  if(!file){
+    $("pfpMessage").innerHTML =
+      '<div class="error">Choose an image first.</div>';
+    return;
+  }
+
+  const extension =
+    file.name.split(".").pop().toLowerCase();
+
+  const path = "website/pfp-"+Date.now()+"."+extension;
+
+  const {error:uploadError} = await sb
+    .storage
+    .from(STORAGE_BUCKET)
+    .upload(path,file,{
+      upsert:true,
+      contentType:file.type
+    });
+
+  if(uploadError){
+    $("pfpMessage").innerHTML =
+      '<div class="error">'+escapeHTML(uploadError.message)+'</div>';
+    return;
+  }
+
+  const {data:urlData} = sb
+    .storage
+    .from(STORAGE_BUCKET)
+    .getPublicUrl(path);
+
+  const url = urlData.publicUrl;
+
+  const {error:updateError} = await sb
+    .from("site_settings")
+    .update({pfp_url:url})
+    .eq("id",1);
+
+  if(updateError){
+    $("pfpMessage").innerHTML =
+      '<div class="error">'+escapeHTML(updateError.message)+'</div>';
+    return;
+  }
+
+  $("settingsPfpPreview").src = url;
+  $("adminPfpTop").src = url;
+  $("navPfp").src = url;
+
+  $("pfpMessage").innerHTML =
+    '<div class="success">PFP updated.</div>';
+}
+
+
+/* =========================================================
+   ADMIN WORK / PROJECTS
+   ========================================================= */
+
+async function addProject(){
+
+  const title = $("projectTitle").value.trim();
+  const description = $("projectDescription").value.trim();
+  const file = $("projectImage").files[0];
+
+  if(!title || !file){
+    $("projectMessage").innerHTML =
+      '<div class="error">Project name and image are required.</div>';
+    return;
+  }
+
+  const extension =
+    file.name.split(".").pop().toLowerCase();
+
+  const path =
+    "projects/"+Date.now()+"-"+Math.random().toString(36).slice(2)+"."+extension;
+
+  const {error:uploadError} = await sb
+    .storage
+    .from(STORAGE_BUCKET)
+    .upload(path,file,{
+      upsert:false,
+      contentType:file.type
+    });
+
+  if(uploadError){
+    $("projectMessage").innerHTML =
+      '<div class="error">'+escapeHTML(uploadError.message)+'</div>';
+    return;
+  }
+
+  const {data:urlData} = sb
+    .storage
+    .from(STORAGE_BUCKET)
+    .getPublicUrl(path);
+
+  const {error} = await sb
+    .from("projects")
+    .insert({
+      title:title,
+      description:description,
+      image_url:urlData.publicUrl
+    });
+
+  if(error){
+    $("projectMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("projectTitle").value = "";
+  $("projectDescription").value = "";
+  $("projectImage").value = "";
+
+  $("projectMessage").innerHTML =
+    '<div class="success">Project added.</div>';
+
+  loadAdminWork();
+}
+
+
+async function loadAdminWork(){
+
+  const {data,error} = await sb
+    .from("projects")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const grid = $("adminWorkGrid");
+
+  if(!data || !data.length){
+    grid.innerHTML =
+      '<div class="card"><p>No projects yet.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(p=>`
+
+    <div class="work">
+
+      <img src="${escapeHTML(p.image_url)}">
+
+      <div class="work-info">
+        <h3>${escapeHTML(p.title)}</h3>
+        <p>${escapeHTML(p.description || "")}</p>
+        <br>
+
+        <button class="btn red"
+          onclick="deleteProject('${p.id}')">
+          Delete
+        </button>
+      </div>
+
+    </div>
+
+  `).join("");
+}
+
+
+async function deleteProject(id){
+
+  if(!confirm("Delete this project?")) return;
+
+  const {error} = await sb
+    .from("projects")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  loadAdminWork();
+}
+
+
+/* =========================================================
+   ADMIN VOUCHES
+   ========================================================= */
+
+async function loadAdminVouches(){
+
+  const {data,error} = await sb
+    .from("vouches")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const pending = data.filter(v=>v.status === "Pending");
+  const approved = data.filter(v=>v.status === "Approved");
+
+  if(!pending.length){
+
+    $("pendingVouches").innerHTML =
+      '<p style="color:#888">No pending vouches.</p>';
+
+  }else{
+
+    $("pendingVouches").innerHTML = pending.map(v=>`
+
+      <div class="card" style="margin-bottom:12px">
+
+        <strong>${escapeHTML(v.client_name)}</strong>
+
+        <div class="stars">
+          ${"★".repeat(Number(v.rating))}
+        </div>
+
+        <p>${escapeHTML(v.text)}</p>
+
+        <br>
+
+        <button class="btn green"
+          onclick="approveVouch('${v.id}')">
+          Approve
+        </button>
+
+        <button class="btn red"
+          onclick="rejectVouch('${v.id}')">
+          Reject
+        </button>
+
+      </div>
+
+    `).join("");
+  }
+
+
+  if(!approved.length){
+
+    $("approvedVouchesAdmin").innerHTML =
+      '<p style="color:#888">No approved vouches.</p>';
+
+  }else{
+
+    $("approvedVouchesAdmin").innerHTML = approved.map(v=>`
+
+      <div class="card" style="margin-bottom:12px">
+
+        <strong>${escapeHTML(v.client_name)}</strong>
+
+        <div class="stars">
+          ${"★".repeat(Number(v.rating))}
+        </div>
+
+        <p>${escapeHTML(v.text)}</p>
+
+        <br>
+
+        <button class="btn red"
+          onclick="deleteVouch('${v.id}')">
+          Delete
+        </button>
+
+      </div>
+
+    `).join("");
+  }
+}
+
+
+async function approveVouch(id){
+
+  const {error} = await sb
+    .from("vouches")
+    .update({status:"Approved"})
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  loadAdminVouches();
+  loadPublicVouches();
+}
+
+
+async function rejectVouch(id){
+
+  const {error} = await sb
+    .from("vouches")
+    .update({status:"Rejected"})
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  loadAdminVouches();
+}
+
+
+async function deleteVouch(id){
+
+  if(!confirm("Delete this vouch?")) return;
+
+  const {error} = await sb
+    .from("vouches")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  loadAdminVouches();
+  loadPublicVouches();
+}
+
+
+async function addManualVouch(){
+
+  const name = $("manualVouchName").value.trim();
+  const rating = Number($("manualVouchRating").value);
+  const text = $("manualVouchText").value.trim();
+
+  if(!name || !text){
+    $("manualVouchMessage").innerHTML =
+      '<div class="error">Fill in all fields.</div>';
+    return;
+  }
+
+  const {error} = await sb
+    .from("vouches")
+    .insert({
+      client_name:name,
+      rating:rating,
+      text:text,
+      status:"Approved"
+    });
+
+  if(error){
+    $("manualVouchMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("manualVouchName").value = "";
+  $("manualVouchText").value = "";
+
+  $("manualVouchMessage").innerHTML =
+    '<div class="success">Vouch added.</div>';
+
+  loadAdminVouches();
+  loadPublicVouches();
+}
+
+
+/* =========================================================
+   ADMIN ORDERS
+   ========================================================= */
+
+async function loadAdminOrders(){
+
+  const {data,error} = await sb
+    .from("orders")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const tbody = $("adminOrders");
+
+  if(!data || !data.length){
+    tbody.innerHTML =
+      '<tr><td colspan="5">No orders yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(o=>`
+
+    <tr>
+
+      <td>
+        ${escapeHTML(o.customer_name || o.user_id)}
+      </td>
+
+      <td>
+        ${escapeHTML(o.package_name)}
+      </td>
+
+      <td>
+        ${escapeHTML(o.requirements)}
+      </td>
+
+      <td>
+        <span class="status ${String(o.status).toLowerCase()}">
+          ${escapeHTML(o.status)}
+        </span>
+      </td>
+
+      <td>
+
+        <select
+          onchange="changeOrderStatus('${o.id}',this.value)">
+          <option ${o.status==="Pending"?"selected":""}>Pending</option>
+          <option ${o.status==="In Progress"?"selected":""}>In Progress</option>
+          <option ${o.status==="Completed"?"selected":""}>Completed</option>
+          <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
+        </select>
+
+      </td>
+
+    </tr>
+
+  `).join("");
+}
+
+
+async function changeOrderStatus(id,status){
+
+  const {error} = await sb
+    .from("orders")
+    .update({status:status})
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  loadAdminOrders();
+}
+
+
+/* =========================================================
+   CHANGE ADMIN PASSWORD
+   ========================================================= */
+
+async function changeAdminPassword(){
+
+  const password = $("newAdminPassword").value;
+  const confirmPassword = $("confirmAdminPassword").value;
+
+  if(password.length < 8){
+    $("passwordMessage").innerHTML =
+      '<div class="error">Password must be at least 8 characters.</div>';
+    return;
+  }
+
+  if(password !== confirmPassword){
+    $("passwordMessage").innerHTML =
+      '<div class="error">Passwords do not match.</div>';
+    return;
+  }
+
+  const {error} = await sb.auth.updateUser({
+    password:password
+  });
+
+  if(error){
+    $("passwordMessage").innerHTML =
+      '<div class="error">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  $("newAdminPassword").value = "";
+  $("confirmAdminPassword").value = "";
+
+  $("passwordMessage").innerHTML =
+    '<div class="success">Password changed successfully.</div>';
+}
+
+
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
+
+sb.auth.onAuthStateChange(async (event,session)=>{
+
+  if(session){
+
+    currentUser = session.user;
+
+    const admin = await checkIfAdmin(currentUser.id);
+
+    if(admin){
+      showAdminDashboard();
+    }else{
+      showCustomerDashboard();
+    }
+
+  }else{
+
+    currentUser = null;
+
+  }
+
+});
+
+
+/* =========================================================
+   INITIAL LOAD
+   ========================================================= */
+
+async function init(){
+
+  await loadSettings();
+  await loadPublicVouches();
+  await checkSession();
+
+}
+
+init();
+
+</script>
+
+</body>
+</html>
